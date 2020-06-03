@@ -12,10 +12,6 @@ app.get('/', async (req, res) => {
     res.render('index')
 })
 
-app.post('/upload', async(req, res) => {
-    console.log(); // the uploaded file object
-  });
-
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyParser.urlencoded({extended: false}))
 // takes everything as a string
@@ -32,12 +28,26 @@ app.get('/', async(req, res) => {
     res.render('index')
 })
 
-app.post('/upload', async (req, res) => {
-    let files = req.files.foo
-    res.render('upload', {files});
+app.get('/upload', async(req, res) => {
+  res.render('upload')
 })
 
-
+app.post('/upload', function(req, res) {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
+  
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    let sampleFile = req.files.sampleFile;
+  
+    // Use the mv() method to place the file somewhere on your server
+    sampleFile.mv('/upload', function(err) {
+      if (err)
+        return res.status(500).send(err);
+  
+      res.send('File uploaded!');
+    });
+  });
 
 
 app.listen(3000, () => {
